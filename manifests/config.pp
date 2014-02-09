@@ -1,4 +1,5 @@
 class cassandra::config(
+    $version,
     $config_path,
     $max_heap_size,
     $heap_newsize,
@@ -58,8 +59,15 @@ class cassandra::config(
         content => template("${module_name}/cassandra-env.sh.erb"),
     }
 
+    $version_array = split($version, '\.')
+
+    $template_name = $version_array[0] ? {
+      '1' => 'cassandra.yaml.erb',
+      default => 'cassandra-20.yaml.erb',
+    }
+
     file { "${config_path}/cassandra.yaml":
         ensure  => file,
-        content => template("${module_name}/cassandra.yaml.erb"),
+        content => template("${module_name}/${template_name}"),
     }
 }
